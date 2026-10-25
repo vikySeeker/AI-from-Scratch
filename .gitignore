@@ -1,4 +1,5 @@
 dataset/__MACOSX/
 dataset/sentiment-labelled-sentences
+tokenizer/__pycache__/
 
 SLS-dataset-.zip
