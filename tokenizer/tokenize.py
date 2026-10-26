@@ -3,23 +3,37 @@ import re
 
 Dataset_file_path: str = None
 
-data = list()
-
-word_index = dict()
-
-_word_idx = 1
-
-raw_word_count = 0
-clean_word_count = 0
-total_line_count = 0
-
-def load(filepath: str = None):
+def load(filepath: str = None, train_data_count: int = 800) -> tuple:
     if not Path(filepath).is_file():
         print("Error: Invalid file path specified or file does not exist!")
         return
     
     global Dataset_file_path
     Dataset_file_path = filepath
+
+    review = list()
+    label = list()
+    train_data = tuple()
+    train_label = tuple()
+    test_data = tuple()
+    test_label = tuple()
+
+    with open(Dataset_file_path, "r") as dataset:
+        for data in dataset:
+            lst = data.rstrip("\n").split("\t")
+            if len(lst) == 2:
+                review.append(lst[0])
+                label.append(lst[1])
+        
+        train_data = review[0:train_data_count]
+        test_data = review[train_data_count:]
+        
+        train_label = label[0:train_data_count]
+        test_label = label[train_data_count:]
+
+    return (train_data, train_label), (test_data, test_label)
+
+
     print(f"Dataset {Dataset_file_path} Loaded successfully!")
 
 def _sample_output():
@@ -27,39 +41,37 @@ def _sample_output():
         print(data[i])
     print(word_index)
 
-def _clean_word(word: str) -> str:
-    word = re.sub(r'[^a-zA-Z0-9]', '', word)
-    return word.lower()
+def _clean_words(words: list) -> list:
+    for i in range(len(words)):
+        words[i] = re.sub(r'[^a-zA-Z0-9]', '', words[i]).lower()
+    return words
 
-
-def _index_words(sentence: list):
-    global raw_word_count
-    global clean_word_count
-    global _word_idx
-    for word in sentence:
-        raw_word_count += 1
-        word = _clean_word(word)
-        if word not in word_index:
-            clean_word_count += 1
-            word_index[word] = _word_idx
-            _word_idx += 1
-
-def run(delim: str = " "):
-    print(f"Initializing the tokenization process with {Dataset_file_path}")
-    with open(Dataset_file_path, "r") as reviews:
-        for review in reviews:
-            splitted_list = review.rstrip("\n").split(delim)
-            splitted_list[0] = splitted_list[0].split(" ")
-            data.append(tuple(splitted_list))
+def tokenize(data: tuple) -> tuple | int:
+    if not data:
+        print("Invalid Data provided!")
     
-    print("Vocabularizing words...")
-    global total_line_count
-    for sentence in data:
-        total_line_count += 1
-        _index_words(sentence[0])
-    print("\n\nTokenization Complete!")
-    print(f"Total line count {total_line_count}")
-    print(f"Total Word count {raw_word_count}")
-    print(f"Unique word count {clean_word_count}")
-    _sample_output()
+    tokenized_data = list()
+    token_count = 0
+    for line in data:
+        line = line.lower()
+        line = line.split(" ")
+        line = _clean_words(line)            
+        token_count += len(line)
+        tokenized_data.append(line)
+
+    return tuple(tokenized_data), token_count
+
+def vocabularize(data: tuple) -> dict | int:
+    if not data:
+        print("Invalid token list provided!")
+    word_index = dict()
+    _word_idx = 1
+
+    for token_list in data:
+        for token in token_list:
+            if token not in word_index:
+                word_index[token] = _word_idx
+                _word_idx += 1
+    
+    return word_index, len(word_index)
 
