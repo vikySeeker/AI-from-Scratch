@@ -8,7 +8,7 @@ def load_vocabulary(vocab: dict):
     global vocabulary
     vocabulary = vocab
 
-def build_BoW(data: list) -> list:
+def build_BoW(data: list, padding: str = None) -> list:
     if not vocabulary:
         printf("Vocabulary is not initialized yet!")
         return None
@@ -17,8 +17,14 @@ def build_BoW(data: list) -> list:
         return None
 
     vector_list = list()
+    padding_length = 0
+    if padding != None:
+        longest_list = max(data, key=len)
+        padding_length = len(longest_list)
+        
     for token_list in data:
         vector = list()
+        vector_len = 0
         seen = set()
         for token in token_list:
             if token in seen:
@@ -26,6 +32,10 @@ def build_BoW(data: list) -> list:
             seen.add(token)
             if token in vocabulary:
                 vector.append(token_list.count(token))
+        vector_len = len(vector)
+        if padding == 1 and vector_len < padding_length:
+            needed = padding_length - vector_len
+            vector.extend([0] * needed)
 
         vector_list.append(vector)
     

@@ -23,11 +23,6 @@ print(f"Total Vocabularies {vocab_size}")
 print(f"Building Bag of Words vector...")
 
 bw.load_vocabulary(vocabulary)
-vector = bw.build_BoW(tokens)
+vector = bw.build_BoW(tokens, padding=1)
 
-print(f"Vector built successfully!")
-
-# print("Printing first 100 vecotr with respective sentence\n")
-
-# for i in range(10):
-#     print(f"{tokens[i]} = {vector[i]}")
+print(f"Vector built successfully!\n")
