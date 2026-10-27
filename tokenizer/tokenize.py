@@ -3,6 +3,10 @@ import re
 
 Dataset_file_path: str = None
 
+# this method will load the data from the file and split the data into 
+# training and test data in the ratio 5:1 and returns a nested tuple of 
+# data and labels of both train and test 
+
 def load(filepath: str = None, train_data_count: int = 800) -> tuple:
     if not Path(filepath).is_file():
         print("Error: Invalid file path specified or file does not exist!")
@@ -36,15 +40,21 @@ def load(filepath: str = None, train_data_count: int = 800) -> tuple:
 
     print(f"Dataset {Dataset_file_path} Loaded successfully!")
 
+# just a debug function to print the of tokenize and vocabularize functions.
 def _sample_output():
     for i in range(100):
         print(data[i])
     print(word_index)
 
+# takes a list of words normally a list contains of tokenized sentence and 
+# strips any non alpha numeric characters. (eg. the word "dog!" -> "dog", "etc..." -> "etc")
+
 def _clean_words(words: list) -> list:
     for i in range(len(words)):
         words[i] = re.sub(r'[^a-zA-Z0-9]', '', words[i]).lower()
     return words
+
+# Tokenizes list of sentences and returns a nested list of tokens of each sentence.
 
 def tokenize(data: tuple) -> tuple | int:
     if not data:
@@ -61,6 +71,7 @@ def tokenize(data: tuple) -> tuple | int:
 
     return tuple(tokenized_data), token_count
 
+# Takes the nested list of tokens and genertes a vocabulary dictionary with each word has it's unique index.
 def vocabularize(data: tuple) -> dict | int:
     if not data:
         print("Invalid token list provided!")

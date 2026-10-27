@@ -1,5 +1,7 @@
 vocabulary = None
 
+# Loads the vocabulary for the bag of words model to utilize
+
 def load_vocabulary(vocab: dict):
     if not vocab:
         print("Invalid Vocabulary data!")
@@ -7,6 +9,11 @@ def load_vocabulary(vocab: dict):
     
     global vocabulary
     vocabulary = vocab
+
+# builds a bag of words vector from the given list of training dataset
+# the training data passed is in the format of nested list tokens
+# this will return a nested list of vectors where it frequency of each word is
+# the vector is padded with 0 to match the length of the longest sentence list.  
 
 def build_BoW(data: list, padding: str = None) -> list:
     if not vocabulary:
